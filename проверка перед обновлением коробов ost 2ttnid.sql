@@ -1,0 +1,26 @@
+-- ѕроверим, что будет обновлено
+SELECT 
+    t1.sscc as pallet_sscc,
+    t2.sscc as box_sscc,
+    t2.parentsscc as old_parentsscc,
+    t1.sscc as new_parentsscc,
+    t2.ost as old_ost,
+    2 as new_ost
+FROM ttn_sscc t1  -- паллеты
+INNER JOIN ttn_sscc t2 ON t2.ttnid = t1.ttnid  -- короба с тем же ttnid
+WHERE 
+    t1.ttnid IN ('260454', '260452', '260451') -- ¬аши TTNID
+    AND t1.sscc = t1.parentsscc     -- это паллеты
+    AND t1.ost = 1                  -- паллеты активны
+    AND t2.sscc = t2.parentsscc     -- короба Ќ≈ проставлены
+    AND t2.ost = 1                  -- короба активны
+    AND t2.parentsscc != t1.sscc    -- короба не св€заны с этим паллетом
+    AND t1.sscc NOT IN (SELECT sscc FROM ttn_spec_sgtin WHERE sscc IS NOT NULL)
+    AND NOT EXISTS (
+        SELECT 1 
+        FROM ttn_sscc t3 
+        WHERE t3.ttnid = t1.ttnid 
+          AND t3.sscc = t3.parentsscc
+          AND t3.parentsscc != t1.sscc
+          AND t3.ost != 1
+    )

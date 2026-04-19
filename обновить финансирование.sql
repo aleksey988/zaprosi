@@ -1,0 +1,9 @@
+UPDATE ttn
+SET markSupplierFinancingSource = 2
+WHERE id IN (
+    SELECT DISTINCT ttn_id
+    FROM ttn_spec_sgtin
+    WHERE sgtin IN (
+        '046070081336841169140818205','046070081336841600086810960','046070081336841624046116421'
+    )
+);
